@@ -13,6 +13,7 @@ for (let numero of arreglo){ //Valores
     console.log('numero', numero);
 }
 
+//for in
 for (let indice in arreglo){ //Indices
     arreglo[indice];
     console.log('indice', indice);
