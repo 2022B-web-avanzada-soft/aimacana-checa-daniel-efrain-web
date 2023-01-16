@@ -18,7 +18,7 @@ function promesaLeer(path) { // f -> Promesa
                         reject(console.error('ERROR LEYENDO ARCHIVO',errorLecturaPrimerArchivo));
                     }else{
                         console.log('Contenido: ', contenidoPrimerArchivo);
-                        resolve(path);
+                        resolve(contenidoPrimerArchivo)
                     }
                 }
             )
@@ -44,7 +44,27 @@ function ejercicio08(path, contenidoArchivo){
         })
 }
 
-ejercicio08('./06-ejemplo.txt', ':) lo logramos')
-    .then()
-    .catch()
+// ejercicio08('./06-ejemplo.txt', ':) lo logramos')
+//     .then()
+//     .catch()
 
+// ASYNC AWAIT
+// REGLAS
+// 1) Estar dentro de una función (nombrada o anónima)
+// 2) AGREGAR la palabra 'async' antes de la declaración de la función
+// 3) Agregar la palabra await antes de la declaración de una promesa.
+async function asyncAwaitUno(path, nuevoContenido){
+    //Si sabemos que en la promesa va a haber un reject usamos try and catch
+    try{
+        const respuestaContenidoArchivoOriginal = await promesaLeer(path);
+        await escribirArchivo(path, respuestaContenidoArchivoOriginal + nuevoContenido);
+
+    }catch (error){
+        console.error(error);
+    }
+}
+const asyncAwaitDos = function (){}
+
+const asyncAwaitTres = ()=>{}
+
+asyncAwaitUno('./06-ejemplo.txt', 'lo logramos :)')
