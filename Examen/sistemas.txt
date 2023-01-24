@@ -1,0 +1,1 @@
+[{"id":2,"nombre":"Sistema Cetauri","numeroDePlanetas":"3","estrella":"Gran Centauri","edad":"2"},{"id":3,"nombre":"Sistema Solar","numeroDePlanetas":"8","estrella":"Sol","edad":"2"},{"id":4,"nombre":"Sistema Solar","numeroDePlanetas":"8","estrella":"Sol","edad":"2"}]

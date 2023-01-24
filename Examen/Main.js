@@ -2,30 +2,23 @@ const inquirer = require("inquirer");
 const fs = require("fs");
 
 class SistemaSolar {
-    constructor(nombre, numeroDePlanetas, estrella, edad, distanciaAlaTierra) {
+    constructor(id, nombre, numeroDePlanetas, estrella, edad) {
+        this.id = id;
         this.nombre = nombre;
         this.numeroDePlanetas = numeroDePlanetas;
         this.estrella = estrella;
         this.edad = edad;
-        this.distanciaAlaTierra = distanciaAlaTierra;
-        this.planetas = [];
-    }
-
-    addPlaneta(planeta) {
-        this.planetas.push(planeta);
     }
 }
 
 class Planeta {
-    constructor(nombre, tipo, tamaño, numeroDeSatelites, distanciaAlSol, tieneAnillos, descubiertoEn, descubridor, tieneVida, fechaUltimaVisita) {
+    constructor(id, idSistema, nombre, numeroDeSatelites, distanciaAlSol, tieneAnillos, tieneVida, fechaUltimaVisita) {
+        this.id = id;
+        this.idSistema = idSistema;
         this.nombre = nombre;
-        this.tipo = tipo;
-        this.tamaño = tamaño;
         this.numeroDeSatelites = numeroDeSatelites;
         this.distanciaAlSol = distanciaAlSol;
         this.tieneAnillos = tieneAnillos;
-        this.descubiertoEn = descubiertoEn;
-        this.descubridor = descubridor;
         this.tieneVida = tieneVida;
         this.fechaUltimaVisita = fechaUltimaVisita;
     }
@@ -84,197 +77,363 @@ const preguntasPlaneta = [
     }
 ];
 
-async function respuestasPlaneta(sistemaSolar, numeroPlanetas){
 
-    do{
-        const respuestas = await inquirer
-            .prompt(preguntasPlaneta)
-            .then(respuestasPlaneta => {
-                let planeta = new Planeta(
-                    respuestasPlaneta.nombre,
-                    respuestasPlaneta.tipo,
-                    respuestasPlaneta.tamaño,
-                    respuestasPlaneta.numeroDeSatelites,
-                    respuestasPlaneta.distanciaAlSol,
-                    respuestasPlaneta.tieneAnillos,
-                    respuestasPlaneta.descubiertoEn,
-                    respuestasPlaneta.descubridor,
-                    respuestasPlaneta.tieneVida,
-                    respuestasPlaneta.fechaUltimaVisita
-                );
-
-                const jsonPlaneta = JSON.stringify(planeta);
-                console.log(jsonPlaneta);
-                sistemaSolar.addPlaneta(jsonPlaneta);
-            });
-        numeroPlanetas--;
-    }while (numeroPlanetas > 0)
-
-
-}
-
-
-
-async function usuario() {
-
-
-    const usr = await inquirer
-        .prompt([
-            {
-                type: "list",
-                name: "opcion",
-                message: "¿Qué deseas hacer?",
-                choices: [
-                    "Crear sistema solar y planetas",
-                    "Leer sistemas solares y planetas",
-                    "Actualizar sistema solar y planetas",
-                    "Eliminar sistema solar y planetas",
-                    "Salir"
-                ]
-            }
-        ])
-        .then(respuestas => {
-            switch (respuestas.opcion) {
-                case "Crear sistema solar y planetas":
-                    inquirer
-                        .prompt(preguntasSistemaSolar)
-                        .then(respuestasSistemaSolar => {
-                            let sistemaSolar = new SistemaSolar(
-                                respuestasSistemaSolar.nombre,
-                                respuestasSistemaSolar.numeroDePlanetas,
-                                respuestasSistemaSolar.estrella,
-                                respuestasSistemaSolar.edad,
-                                respuestasSistemaSolar.distanciaAlaTierra
-                            );
-
-                            respuestasPlaneta(sistemaSolar, sistemaSolar.numeroDePlanetas);
-
-                            fs.writeFileSync(
-                                `${sistemaSolar.nombre}.json`,
-                                JSON.stringify(sistemaSolar)
-                            );
-                            console.log(
-                                `Sistema solar ${sistemaSolar.nombre} y planetas creados y guardados en archivo local.`
-                            );
-                        });
-
-                    break;
-                case "Leer sistemas solares y planetas":
-                    fs.readdir("./", (err, files) => {
-                        if (err) {
-                            console.error(err);
-                            return;
-                        }
-                        files
-                            .filter(file => file.endsWith(".json"))
-                            .forEach(file => {
-                                let sistemaSolar = JSON.parse(fs.readFileSync(file));
-                                console.log(`Sistema Solar: ${sistemaSolar.nombre}`);
-                                console.log("Planetas:");
-                                sistemaSolar.planetas.forEach(planeta => {
-                                    console.log(`- ${planeta.nombre}`);
-                                });
-                            });
-                    });
-                    break;
-                case "Actualizar sistema solar y planetas":
-                    inquirer
-                        .prompt([
-                            {
-                                name: "nombreSistemaSolar",
-                                message: "Ingresa el nombre del sistema solar a actualizar:"
-                            },
-                            {
-                                type: "list",
-                                name: "opcionActualizar",
-                                message: "¿Qué deseas actualizar?",
-                                choices: [
-                                    "Información del sistema solar",
-                                    "Información de un planeta"
-                                ]
-                            }
-                        ])
-                        .then(respuestasActualizar => {
-                            let sistemaSolar = JSON.parse(
-                                fs.readFileSync(`${respuestasActualizar.nombreSistemaSolar}.json`)
-                            );
-                            if (respuestasActualizar.opcionActualizar === "Información del sistema solar") {
-                                inquirer
-                                    .prompt(preguntasSistemaSolar)
-                                    .then(respuestasNuevaInfo => {
-                                        sistemaSolar.nombre = respuestasNuevaInfo.nombre;
-                                        sistemaSolar.numeroDePlanetas = respuestasNuevaInfo.numeroDePlanetas;
-                                        sistemaSolar.estrella = respuestasNuevaInfo.estrella;
-                                        sistemaSolar.edad = respuestasNuevaInfo.edad;
-                                        sistemaSolar.distanciaAlaTierra = respuestasNuevaInfo.distanciaAlaTierra;
-                                        fs.writeFileSync(
-                                            `${sistemaSolar.nombre}.json`,
-                                            JSON.stringify(sistemaSolar)
-                                        );
-                                        console.log(`Información del sistema solar ${sistemaSolar.nombre} actualizada.`);
-                                    });
-                            } else {
-                                inquirer
-                                    .prompt([
-                                        {
-                                            name: "nombrePlaneta",
-                                            message: "Ingresa el nombre del planeta a actualizar:"
-                                        },
-                                        ...preguntasPlaneta
-                                    ])
-                                    .then(respuestasNuevaInfo => {
-                                        let planeta = sistemaSolar.planetas.find(
-                                            planeta => planeta.nombre === respuestasNuevaInfo.nombrePlaneta
-                                        );
-                                        planeta.nombre = respuestasNuevaInfo.nombre;
-                                        planeta.tipo = respuestasNuevaInfo.tipo;
-                                        planeta.tamaño = respuestasNuevaInfo.tamaño;
-                                        planeta.numeroDeSatelites = respuestasNuevaInfo.numeroDeSatelites;
-                                        planeta.distanciaAlSol = respuestasNuevaInfo.distanciaAlSol;
-                                        planeta.tieneAnillos = respuestasNuevaInfo.tieneAnillos;
-                                        planeta.descubiertoEn = respuestasNuevaInfo.descubiertoEn;
-                                        planeta.descubridor = respuestasNuevaInfo.descubridor;
-                                        planeta.tieneVida = respuestasNuevaInfo.tieneVida;
-                                        planeta.fechaUltimaVisita = respuestasNuevaInfo.fechaUltimaVisita;
-                                        fs.writeFileSync(
-                                            `${sistemaSolar.nombre}.json`,
-                                            JSON.stringify(sistemaSolar)
-                                        );
-                                        console.log(`Información del planeta ${planeta.nombre} actualizada.`);
-                                    });
-                            }
-                        });
-                    break;
-                case "Eliminar sistema solar y planetas":
-                    inquirer
-                        .prompt([
-                            {
-                                name: "nombreSistemaSolar",
-                                message: "Ingresa el nombre del sistema solar a eliminar:"
-                            },
-                            {
-                                type: "confirm",
-                                name: "confirmacion",
-                                message: "¿Estás seguro de que deseas eliminar el sistema solar y sus planetas?"
-                            }
-                        ])
-                        .then(respuestasEliminar => {
-                            if (respuestasEliminar.confirmacion) {
-                                fs.unlinkSync(`${respuestasEliminar.nombreSistemaSolar}.json`);
-                                console.log(`Sistema solar ${respuestasEliminar.nombreSistemaSolar} y planetas eliminados.`);
-                            } else {
-                                console.log("Operación cancelada.");
-                            }
-                        });
-                    break;
-                case "Salir":
-                    console.log("Hasta luego!");
-                    menuContinuar = false;
-                    break;
+function leer(path) {
+    return new Promise((resolve, reject) => {
+        fs.readFile(path, 'utf-8', (errorLeerArchivoTxt, contenidoArchivo) => {
+            if (errorLeerArchivoTxt) {
+                reject("Error al leer el archivo");
+            } else {
+                resolve(contenidoArchivo);
+                return contenidoArchivo
             }
         });
+    });
 }
 
-usuario();
+
+// CREAR SISTEMASOLAR
+async function crearSistemaSolar(sistemaSolar) {
+    fs.readFile('sistemas.txt', (err, data) => {
+        if (err) {
+            throw err;
+        }
+        console.log(sistemaSolar+'Datos entrantes\n')
+        console.log(data+'datos leidos\n');
+        let sistemasSolares = JSON.parse(data);
+        console.log(sistemasSolares+'objetos leidos de dara\n')
+        sistemasSolares.push(sistemaSolar);
+        console.log(sistemasSolares+'objetos pero aumentado\n')
+        fs.writeFile('sistemas.txt', JSON.stringify(sistemasSolares), (err) => {
+            if (err) {
+                throw err;
+            }
+            //console.log('La marca de relojes ha sido creada exitosamente.');
+        });
+    });
+
+
+}
+
+// Función para leer un sistema solar
+async function readSistemaSolar(id) {
+    fs.readFile('sistemas.txt', (err, data) => {
+        if (err) {
+            throw err;
+        }
+        let sistemasSolares = JSON.parse(data);
+        let sistemaSolar = sistemasSolares.find(wb => wb.id === id);
+        if (sistemaSolar) {
+            console.log(sistemaSolar);
+            return sistemaSolar;
+        } else {
+            console.log('El sistema solar no existe.');
+        }
+    });
+}
+
+// Función para actualizar un sistema solar
+async function actualizarSistemaSolar(id, updates) {
+    await fs.readFile('sistemas.txt', (err, data) => {
+        if (err) {
+            throw err;
+        }
+        //Arreglo de objetos de sistemas solares
+        let sistemasSolares = JSON.parse(data);
+        // devuelve el indice del areglo de objetos, cuando el indice mandado por parametros se igual al indice de ese indice.
+        let sistemaSolarIndice = sistemasSolares.findIndex(wb => wb.id === id);
+        if (sistemaSolarIndice !== -1) {
+            for (let key in updates) {
+                sistemasSolares[sistemaSolarIndice][key] = updates[key];
+            }
+            fs.writeFile('sistemas.txt', JSON.stringify(sistemasSolares), (err) => {
+                if (err) {
+                    throw err;
+                }
+
+            });
+        } else {
+            console.log('')
+        }
+    });
+}
+
+// Función para eliminar un sistema solar
+async function borrarSistemaSolar(id) {
+    await fs.readFile('sistemas.txt', (err, data) => {
+        if (err) {
+            throw err;
+        }
+        let sistemasSolares = JSON.parse(data);
+        let sistemaSolarIndice = sistemasSolares.findIndex(wb => wb.id === id);
+        if (sistemaSolarIndice !== -1) {
+            sistemasSolares.splice(sistemaSolarIndice, 1);
+            fs.writeFile('sistemas.txt', JSON.stringify(sistemasSolares), (err) => {
+                if (err) {
+                    throw err;
+                }
+                console.log('')
+            });
+        } else {
+            console.log('')
+        }
+    });
+}
+
+// CRUD entidad Planeta
+
+// CREAR PLANETA
+async function crearPlaneta(planeta) {
+    fs.readFile('planetas.txt', (err, data) => {
+        if (err) {
+            throw err;
+        }
+        let planetas = JSON.parse(data);
+
+        planetas.push(planeta);
+        fs.writeFile('planetas.txt', JSON.stringify(planetas), (err) => {
+            if (err) {
+                throw err;
+            }
+            console.log('')
+        });
+    });
+}
+
+// LEER PLANETA
+async function readPlaneta(id) {
+    fs.readFile('planetas.txt', (err, data) => {
+        if (err) {
+            throw err;
+        }
+        let planetas = JSON.parse(data);
+        let planeta = planetas.find(w => w.id === id);
+        if (planeta) {
+            return planeta;
+        } else {
+            console.log('El planeta no existe.');
+        }
+    });
+}
+
+// ACTUALIZAR PLANETA
+async function updatePlaneta(id, updates) {
+    fs.readFile('planetas.txt', (err, data) => {
+        if (err) {
+            throw err;
+        }
+        let planetas = JSON.parse(data);
+        let planetaIndice = planetas.findIndex(w => w.id === id);
+        if (planetaIndice !== -1) {
+            for (let key in updates) {
+                planetas[planetaIndice][key] = updates[key];
+            }
+            fs.writeFile('planetas.txt', JSON.stringify(planetas), (err) => {
+                if (err) {
+                    throw err;
+                }
+                console.log('')
+            });
+        } else {
+            console.log('')
+            console.log('El reloj no existe.');
+        }
+    });
+}
+
+// ELIMINAR PLANETA
+async function borrarPlaneta(id) {
+    fs.readFile('planetas.txt', (err, data) => {
+        if (err) {
+            throw err;
+        }
+        let planetas = JSON.parse(data);
+        let planetaIndice = planetas.findIndex(w => w.id === id);
+        if (planetaIndice !== -1) {
+            planetas.splice(planetaIndice, 1);
+            fs.writeFile('planetas.txt', JSON.stringify(planetas), (err) => {
+                if (err) {
+                    throw err;
+                }
+                console.log('El planeta ha sido eliminado exitosamente.');
+            });
+        } else {
+            console.log('El planeta no existe.');
+        }
+    });
+}
+
+async function leerOpcion() {
+    try {
+        const respuesta = await inquirer
+            .prompt([{
+                type: 'input', name: 'opcion', message: '...'
+            }])
+        return respuesta['opcion'];
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+async function mainPlanetas() {
+    let opcion;
+    while (opcion != 5) {
+        console.log('\t PLANETA');
+        console.log('1.- Leer\n2.- Crear\n3.- Modificar\n4.- Eliminar\n5.- Salir');
+        console.log('Ingresa la opción...')
+        opcion = Number(await leerOpcion());
+        let planetas = null;
+        switch (opcion) {
+            case 1 :
+
+
+
+                /* this.id = id;
+        this.idSistema = idSistema;
+        this.nombre = nombre;
+        this.numeroDeSatelites = numeroDeSatelites;
+        this.distanciaAlSol = distanciaAlSol;
+        this.tieneAnillos = tieneAnillos;
+        this.tieneVida = tieneVida;
+        this.fechaUltimaVisita = fechaUltimaVisita;*/
+
+                planetas = JSON.parse(await leer('planetas.txt'));
+                for (const planeta of planetas) {
+                    console.log('Codigo del planeta en el sistema:', planeta['id']);
+                    console.log('Sistema al que pertenece:', planeta['idSistema']);
+                    console.log('Número de satélites:', planeta['numeroDeSatelites']);
+                    console.log('Fecha de última visita:', planeta['fechaUltimaVisita'], '\n');
+                }
+
+                break;
+            case 2 :
+                let id = 0;
+                try {
+                    const respuesta = await inquirer
+                        .prompt(preguntasPlaneta);
+
+                    const planetass = JSON.parse(await leer('planetas.txt'));
+                    planetass.forEach(planeta => {
+                        if (id < planeta["id"]) {
+                            id = planeta["id"];
+                        }
+                    });
+                    id++;
+                    let planet = new Planeta(id, respuesta['idSistema'], respuesta["nombre"], respuesta['numeroDeSatelites'], respuesta['distanciaAlSol'], respuesta['tieneAnillos'], respuesta['tieneVida'], respuesta['fechaUltimaVisita']);
+
+                    await crearPlaneta(planet);
+                    console.log('planet creado');
+
+
+                } catch (e) {
+                    console.log(e);
+                }
+                break;
+
+            case 3 :
+                console.log('Ingrese el id del planeta a modificar')
+                let modificar = Number(await leerOpcion());
+
+                try {
+                    const respuesta = await inquirer
+                        .prompt(preguntasPlaneta);
+                    let planetaNuevo = new Planeta(modificar, respuesta['idSistema'], respuesta["nombre"], respuesta['numeroDeSatelites'], respuesta['distanciaAlSol'], respuesta['tieneAnillos'], respuesta['tieneVida'], respuesta['fechaUltimaVisita']);
+                    await updatePlaneta(modificar, planetaNuevo)
+                    console.log("Planeta actualizado"+planetaNuevo)
+
+                } catch (e) {
+                    console && console.log(e)
+                }
+                break;
+            case 4 :
+                console.log('Ingrese el id del planeta a eliminar')
+                let eliminar = Number(await leerOpcion());
+                await borrarPlaneta(eliminar)
+                break;
+            default :
+                break;
+        }
+    }
+}
+
+async function main() {
+    let opcion;
+    while (opcion != 6) {
+        console.log('\t SISTEMAS SOLARES');
+        console.log('1.- Leer un sistema solar\n2.- Crear un sistema solar\n3.- Modificar un sistema solar\n4.- Eliminar un sistema solar\n5.- PLANETA\n6.- Salir');
+        console.log('Ingresa la opción')
+        opcion = Number(await leerOpcion());
+        let sistemas = null;
+        switch (opcion) {
+            case 1 :
+
+                /*this.id = id;
+     this.nombre = nombre;
+     this.numeroDePlanetas = numeroDePlanetas;
+     this.estrella = estrella;
+     this.edad = edad;*/
+
+                sistemas = JSON.parse(await leer('sistemas.txt'));
+                sistemas.forEach(sistema => {
+                    console.log('Nombre del sistema:', sistema['nombre']);
+                    console.log('Número de planetas:', sistema['numeroDePlanetas']);
+                    console.log('Su estrella es:', sistema['estrella']);
+                    console.log('Edad:', sistema['edad'], '\n');
+                });
+
+                break;
+            case 2 :
+                let id = 0;
+                try {
+                    const respuesta = await inquirer
+                        .prompt(preguntasSistemaSolar);
+
+                    const sistemas = JSON.parse(await leer('sistemas.txt'));
+                    sistemas.forEach(sistema => {
+                        if (id < sistema["id"]) {
+                            id = sistema["id"];
+                        }
+                    });
+                    id++;
+                    let sistema = new SistemaSolar(id, respuesta['nombre'], respuesta['numeroDePlanetas'], respuesta['estrella'], respuesta['edad']);
+                    await crearSistemaSolar(sistema);
+                    console.log('Sistema solar creado')
+
+
+                } catch (e) {
+                    console.log(e);
+                }
+                break;
+            case 3 :
+                console.log('Ingrese el id del sistema a modificar')
+                let modificar = Number(await leerOpcion());
+                try {
+                    const respuesta = await inquirer
+                        .prompt(preguntasSistemaSolar);
+                    let sistema = new SistemaSolar(modificar, respuesta['nombre'], respuesta['numeroDePlanetas'], respuesta['estrella'], respuesta['edad']);
+                    await actualizarSistemaSolar(modificar, sistema)
+                    console.log('Sistema solar actualizado')
+
+                } catch (e) {
+                    console && console.log(e)
+                }
+                break;
+            case 4 :
+                console.log('Ingrese el id del sistema solar a eliminar')
+                let eliminar = Number(await leerOpcion());
+                await borrarSistemaSolar(eliminar);
+                break;
+            case 5 :
+                console.log('\n')
+                console.log('\n')
+                await mainPlanetas();
+                break;
+            default :
+                break;
+        }
+    }
+}
+
+main()
 
 
