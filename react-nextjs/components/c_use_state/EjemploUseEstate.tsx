@@ -13,9 +13,9 @@ export default function () {
     const [nombre, setNombre] = useState("");
     const [arregloNumeros, setArregloNumeros] = useState([1, 2, 3] as number[]);
     const [usuario, setUsuario] = useState({
-        nombre: "Adrian",
-        edad: 33,
-        casado: true,
+        nombre: "Daniel",
+        edad: 22,
+        casado: false,
     } as Usuario)
 
     // ayuda escuchar cambios variables
