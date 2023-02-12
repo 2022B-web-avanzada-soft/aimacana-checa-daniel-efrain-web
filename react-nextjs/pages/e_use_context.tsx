@@ -6,9 +6,9 @@ export default function (){
     return (
         <>
             <Layout title={'Use Context'}>
-            <h1>Use Context</h1>
-    <EContenedor></EContenedor>
-    </Layout>
+                <h1>Use Context</h1>
+                <EContenedor></EContenedor>
+            </Layout>
     </>
 )
 }
