@@ -2,7 +2,11 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ExamenIIB/server/crud-sistemas-planetas" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Proyecto-Server/auth" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Proyecto-Server/backend" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/TAREA/websockets" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Tarea/client" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/TareaWebSockets/Websocket/websockets" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/TareaWebsockets/websockets/websockets" vcs="Git" />
   </component>

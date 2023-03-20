@@ -1,0 +1,56 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Planeta {
+  id: Int!
+  nombre: String!
+  tieneAnillos: Boolean!
+  fechaUltimaVisita: DateTime!
+  sistemaSolar: SistemaSolar!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type SistemaSolar {
+  id: Int!
+  nombre: String!
+  numeroDePlanetas: Int!
+  estrella: String!
+  edad: Int!
+  planetas: [Planeta!]!
+}
+
+type Query {
+  SistemaSolar: [SistemaSolar!]!
+  planetas: [Planeta!]!
+  planeta(id: Int!): Planeta!
+}
+
+type Mutation {
+  createSistemaSolar(sistemaSolarInput: CreateSistemaSolarInput!): SistemaSolar!
+  createPlaneta(createPlanetaInput: CreatePlanetaInput!): Planeta!
+  updatePlaneta(updatePlanetaInput: UpdatePlanetaInput!): Planeta!
+  removePlaneta(id: Int!): Planeta!
+}
+
+input CreateSistemaSolarInput {
+  nombre: String!
+  numeroDePlanetas: Int!
+  estrella: String!
+  edad: Int!
+}
+
+input CreatePlanetaInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdatePlanetaInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
